@@ -39,10 +39,6 @@ public class WordCount extends Configured implements Tool {
 	    FileOutputFormat.setOutputPath(job1, new Path(args[1] + "/temp"));
 	    job1.waitForCompletion(true);
 	    
-//	    JobControl jobControl = new JobControl("chain jobs");
-//	    ControlledJob controlledJob1 = new ControlledJob(conf1);
-//	    controlledJob1.setJob(job1);
-//	    jobControl.addJob(controlledJob1);
 	    
 	    //job 2
 	    Configuration conf2 = this.getConf();
@@ -58,35 +54,15 @@ public class WordCount extends Configured implements Tool {
 	    job2.setOutputKeyClass(Text.class);
 	    job2.setOutputValueClass(Text.class);
 	    
+	    //check doc, default inputformat is TextInputFormat
+//	    job2.setInputFormatClass(KeyValueTextInputFormat.class);
+	    
 	    job2.setInputFormatClass(TextInputFormat.class);
 	    job2.setOutputFormatClass(TextOutputFormat.class);
 	    
 	    FileInputFormat.setInputPaths(job2, new Path(args[1] + "/temp"));
 	    FileOutputFormat.setOutputPath(job2, new Path(args[1] + "/final"));
 	    
-//	    ControlledJob controlledJob2 = new ControlledJob(conf2);
-//	    controlledJob2.setJob(job2);
-	    
-	    //make job 2 dependents on job1
-//	    controlledJob2.addDependingJob(controlledJob1);
-//	    jobControl.addJob(controlledJob2);
-//	    Thread jobControlThread = new Thread(jobControl);
-//	    jobControlThread.start();
-//	    
-//	    while (!jobControl.allFinished()) {
-//	    System.out.println("Jobs in waiting state: " + jobControl.getWaitingJobList().size());  
-//	    System.out.println("Jobs in ready state: " + jobControl.getReadyJobsList().size());
-//	    System.out.println("Jobs in running state: " + jobControl.getRunningJobList().size());
-//	    System.out.println("Jobs in success state: " + jobControl.getSuccessfulJobList().size());
-//	    System.out.println("Jobs in failed state: " + jobControl.getFailedJobList().size());
-//	try {
-//	    Thread.sleep(5000);
-//	    } catch (Exception e) {
-//
-//	    }
-//
-//	  } 
-//	   System.exit(0);  
 	   return (job2.waitForCompletion(true) ? 0 : 1);   
 
 	}
