@@ -2,3 +2,9 @@
 /FindAirportInCountry$FindAirportInCountryReducer.class
 /FindAirportInCountry.class
 /FindNonStopAirline.class
+/test/
+/FindNonStopAirline$AirlineDataMapper.class
+/FindNonStopAirline$AirportDataMapper.class
+/FindNonStopAirline$FindNonStopAirlineReducer.class
+/FindNonStopAirline$RoutesMapper.class
+/FindNonStopAirline$FinalAirlinesMapper.class

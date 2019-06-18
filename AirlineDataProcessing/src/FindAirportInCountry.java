@@ -30,7 +30,7 @@ public class FindAirportInCountry {
 	}
 	
 	public static class FindAirportInCountryMapper extends Mapper<LongWritable, Text, Text, Text> {
-		private final String COUNTRY = "India";
+		private static final String COUNTRY = "India";
 		private Text outputKey = new Text(COUNTRY);
 		private Text outputVal = new Text();
 		
