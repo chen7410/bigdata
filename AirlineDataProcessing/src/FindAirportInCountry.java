@@ -11,23 +11,23 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class FindAirportInCountry {
-	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		Job job = Job.getInstance(conf, "Find airport");
-		job.setJarByClass(FindAirportInCountry.class);
-		job.setMapperClass(FindAirportInCountryMapper.class);
-		job.setReducerClass(FindAirportInCountryReducer.class);
-		
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(Text.class);
-		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-		
-		
-	}
+//	public static void main(String[] args) throws Exception {
+//		Configuration conf = new Configuration();
+//		Job job = Job.getInstance(conf, "Find airport");
+//		job.setJarByClass(FindAirportInCountry.class);
+//		job.setMapperClass(FindAirportInCountryMapper.class);
+//		job.setReducerClass(FindAirportInCountryReducer.class);
+//		
+//		job.setOutputKeyClass(Text.class);
+//		job.setOutputValueClass(Text.class);
+//		
+//		FileInputFormat.addInputPath(job, new Path(args[0]));
+//		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+//		
+//		System.exit(job.waitForCompletion(true) ? 0 : 1);
+//		
+//		
+//	}
 	
 	public static class FindAirportInCountryMapper extends Mapper<LongWritable, Text, Text, Text> {
 		private static final String COUNTRY = "India";
