@@ -55,6 +55,7 @@ public class FindNonStopAirline extends Configured implements Tool {
 		
 		/**
 		 * get the airline id and name.
+		 * 
 		 */
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] airlineInfo = value.toString().split(",");
@@ -72,12 +73,12 @@ public class FindNonStopAirline extends Configured implements Tool {
 	 *
 	 */
 	public static class FindNonStopAirlineReducer extends Reducer<Text, Text, Text, Text> {
-		private Text dummyKey = new Text();
 		private String STOPS = "0";
 		private Text airlineName = new Text();
 		
 		/**
 		 * output the non-stop airline name.
+		 * @param key airline id.
 		 */
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			boolean haveSTOPS  = false;
@@ -89,6 +90,7 @@ public class FindNonStopAirline extends Configured implements Tool {
 					haveSTOPS = true;
 				}
 			}
+			//the values collection must has 0 and airline name
 			if (haveSTOPS && airlineName.toString().length() > 1) {
 				context.write(key, airlineName);
 			}
@@ -112,8 +114,8 @@ public class FindNonStopAirline extends Configured implements Tool {
 		 return (job.waitForCompletion(true) ? 0 : 1);
 	}
 	
-	public static void main(String[] args) throws Exception {
-		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
-		  System.exit(ecode);
-	}
+//	public static void main(String[] args) throws Exception {
+//		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
+//		  System.exit(ecode);
+//	}
 }
