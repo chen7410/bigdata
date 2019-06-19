@@ -21,21 +21,21 @@ public class ActiveAirlineInCountry {
 	private static final String COUNTRY = "United States";
 	private static final String ACTIVE_CODE = "Y";
 	
-	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		Job job = Job.getInstance(conf, "Active Airline In Country");
-		job.setJarByClass(ActiveAirlineInCountry.class);
-		job.setMapperClass(ActiveAirlineInCountryMapper.class);
-		job.setReducerClass(ActiveAirlineInCountryReducer.class);
-		
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(Text.class);
-		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-	}
+//	public static void main(String[] args) throws Exception {
+//		Configuration conf = new Configuration();
+//		Job job = Job.getInstance(conf, "Active Airline In Country");
+//		job.setJarByClass(ActiveAirlineInCountry.class);
+//		job.setMapperClass(ActiveAirlineInCountryMapper.class);
+//		job.setReducerClass(ActiveAirlineInCountryReducer.class);
+//		
+//		job.setOutputKeyClass(Text.class);
+//		job.setOutputValueClass(Text.class);
+//		
+//		FileInputFormat.addInputPath(job, new Path(args[0]));
+//		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+//		
+//		System.exit(job.waitForCompletion(true) ? 0 : 1);
+//	}
 	
 	public static class ActiveAirlineInCountryMapper extends Mapper<LongWritable, Text, Text, Text> {
 		private Text activeCode = new Text();

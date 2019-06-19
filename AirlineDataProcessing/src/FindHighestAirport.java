@@ -15,6 +15,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class FindHighestAirport {
 	private static final int ALTITUDE_INDEX = 8;
 	private static final int AIRPORT_NAME_INDEX = 2;
+	private static final int COUNTRY_INDEX = 3;
 	
 //	public static void main(String[] args) throws Exception {
 //		Configuration conf = new Configuration();
@@ -33,7 +34,7 @@ public class FindHighestAirport {
 //	}
 	
 	public static class FindHighestAirportMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
-		private Text airportName = new Text();
+		private Text airportNameCountry = new Text();
 		private IntWritable altitude = new IntWritable();
 		/**
 		 * get the altitude and airport name
@@ -42,8 +43,8 @@ public class FindHighestAirport {
 			String[] airportInfo = value.toString().split(",");
 			if (StringUtils.isNumeric(airportInfo[ALTITUDE_INDEX])) {
 				altitude.set(Integer.parseInt(airportInfo[ALTITUDE_INDEX]));
-				airportName.set(airportInfo[AIRPORT_NAME_INDEX]);
-				context.write(altitude, airportName);
+				airportNameCountry.set(airportInfo[AIRPORT_NAME_INDEX] + ", " + airportInfo[COUNTRY_INDEX]);
+				context.write(altitude, airportNameCountry);
 			}
 		}
 	}
@@ -55,11 +56,11 @@ public class FindHighestAirport {
 		 * Airports are group by altitudes.
 		 * The last entry is the highest airport
 		 * @param key altitude
-		 * @param values airport names
+		 * @param values airport names and countries <name, country>
 		 */
 		public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-			for (Text airportName : values) {
-				context.write(key, airportName);
+			for (Text airportNameCountry : values) {
+				context.write(key, airportNameCountry);
 			}
 		}
 	}
