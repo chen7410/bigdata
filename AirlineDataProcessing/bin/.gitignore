@@ -11,3 +11,6 @@
 /FindHighestAirport.class
 /FindHighestAirport$FindHighestAirportMapper.class
 /FindHighestAirport$FindHighestAirportReducer.class
+/ActiveAirlineInCountry.class
+/ActiveAirlineInCountry$ActiveAirlineInCountryMapper.class
+/ActiveAirlineInCountry$ActiveAirlineInCountryReducer.class

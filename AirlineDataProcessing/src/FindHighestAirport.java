@@ -15,21 +15,22 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class FindHighestAirport {
 	private static final int ALTITUDE_INDEX = 8;
 	private static final int AIRPORT_NAME_INDEX = 2;
-	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		Job job = Job.getInstance(conf, "Find airport");
-		job.setJarByClass(FindHighestAirport.class);
-		job.setMapperClass(FindHighestAirportMapper.class);
-		job.setReducerClass(FindHighestAirportReducer.class);
-		
-		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(Text.class);
-		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-		
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-	}
+	
+//	public static void main(String[] args) throws Exception {
+//		Configuration conf = new Configuration();
+//		Job job = Job.getInstance(conf, "Find highest airport");
+//		job.setJarByClass(FindHighestAirport.class);
+//		job.setMapperClass(FindHighestAirportMapper.class);
+//		job.setReducerClass(FindHighestAirportReducer.class);
+//		
+//		job.setOutputKeyClass(IntWritable.class);
+//		job.setOutputValueClass(Text.class);
+//		
+//		FileInputFormat.addInputPath(job, new Path(args[0]));
+//		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+//		
+//		System.exit(job.waitForCompletion(true) ? 0 : 1);
+//	}
 	
 	public static class FindHighestAirportMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 		private Text airportName = new Text();
