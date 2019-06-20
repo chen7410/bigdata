@@ -116,8 +116,8 @@ public class FindNonStopAirline extends Configured implements Tool {
 		 return (job.waitForCompletion(true) ? 0 : 1);
 	}
 	
-	public static void main(String[] args) throws Exception {
-		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
-		  System.exit(ecode);
-	}
+//	public static void main(String[] args) throws Exception {
+//		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
+//		  System.exit(ecode);
+//	}
 }
