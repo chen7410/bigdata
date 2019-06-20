@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
@@ -24,20 +25,20 @@ public class AirlineWithCodeShare extends Configured implements Tool {
 	 * @author matth
 	 *
 	 */
-	public static class RoutesCodeShareMapper extends Mapper<LongWritable, Text, Text, Text> {
+	public static class RoutesCodeShareMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 		private int AIRLINE_ID_INDEX = 1;
 		private int AIRLINE_CODE_SHARE_INDEX = 6;
-		
-		private Text airlineId = new Text();
+		private IntWritable airlineId = new IntWritable();
 		private Text codeshare = new Text();
+		
 		/**
-		 * get the non-stop airline id.
+		 * get the non-stop airline id and codeshare as output.
 		 */
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] routeInfo = value.toString().split(",");
 			if (StringUtils.isNumeric(routeInfo[AIRLINE_ID_INDEX]) && 
 					routeInfo[AIRLINE_CODE_SHARE_INDEX].equals(CODE_SHARE)) {
-				airlineId.set(routeInfo[AIRLINE_ID_INDEX]);
+				airlineId.set(Integer.parseInt(routeInfo[AIRLINE_ID_INDEX]));
 				codeshare.set(CODE_SHARE);
 				context.write(airlineId, codeshare);
 			}
@@ -49,19 +50,19 @@ public class AirlineWithCodeShare extends Configured implements Tool {
 	 * @author matth
 	 *
 	 */
-	public static class FinalAirlinesCodeShareMapper extends Mapper<LongWritable, Text, Text, Text> {
+	public static class FinalAirlinesCodeShareMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 		private int AIRLINE_ID_INDEX = 0;
 		private int AIRLINE_NAME_INDEX = 1;
-		private Text airlineId = new Text();
+		private IntWritable airlineId = new IntWritable();
 		private Text airlineName = new Text();
 		
 		/**
-		 * get the airline id and name.
+		 * get the airline id and name as output.
 		 */
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] airlineInfo = value.toString().split(",");
 			if (StringUtils.isNumeric(airlineInfo[AIRLINE_ID_INDEX])) {
-				airlineId.set(airlineInfo[AIRLINE_ID_INDEX]);
+				airlineId.set(Integer.parseInt(airlineInfo[AIRLINE_ID_INDEX]));
 				airlineName.set(airlineInfo[AIRLINE_NAME_INDEX]);
 				context.write(airlineId, airlineName);
 			}
@@ -73,30 +74,28 @@ public class AirlineWithCodeShare extends Configured implements Tool {
 	 * @author matth
 	 *
 	 */
-	public static class AirlineWithCodeShareReducer extends Reducer<Text, Text, Text, Text> {
+	public static class AirlineWithCodeShareReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 		
-		private Text airline = new Text();
-		private Text dummyKey = new Text();
+		private Text airlineName = new Text();
+		private IntWritable airlineId = new IntWritable();
 		/**
 		 * output the non-stop airline name.
 		 * @param key airline id.
 		 */
-		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			boolean haveCODE_SHARE = false;
 			for (Text val : values) {
 				if (val.toString().length() > 1) {
-					airline.set(val.toString());
+					airlineName.set(val.toString());
 				} else if (val.toString().equals(CODE_SHARE)){
 					haveCODE_SHARE = true;
 				}
 			}
 
-			if (haveCODE_SHARE && airline.toString().length() > 1) {
-				context.write(key, airline);
-			}
-			
-			
-				
+			if (haveCODE_SHARE && airlineName.toString().length() > 1) {
+				airlineId.set(Integer.parseInt(key.toString()));
+				context.write(airlineId, airlineName);
+			}	
 		}
 	}
 
@@ -111,7 +110,7 @@ public class AirlineWithCodeShare extends Configured implements Tool {
 		 FileOutputFormat.setOutputPath(job, new Path(args[2]));
 		 job.setReducerClass(AirlineWithCodeShareReducer.class);
 		 job.setNumReduceTasks(1);
-		 job.setOutputKeyClass(Text.class);
+		 job.setOutputKeyClass(IntWritable.class);
 		 job.setOutputValueClass(Text.class);
 		 
 		 return (job.waitForCompletion(true) ? 0 : 1);

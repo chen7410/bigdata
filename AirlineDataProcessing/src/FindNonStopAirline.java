@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
@@ -24,10 +25,10 @@ public class FindNonStopAirline extends Configured implements Tool {
 	 * @author matth
 	 *
 	 */
-	public static class RoutesMapper extends Mapper<LongWritable, Text, Text, Text> {
+	public static class RoutesMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 		private final int STOPS_INDEX = 7;
 		private final int AIRLINE_ID_INDEX = 1;
-		private Text airlineId = new Text();
+		private IntWritable airlineId = new IntWritable();
 		private Text dummyVal = new Text("0");
 		
 		/**
@@ -36,7 +37,7 @@ public class FindNonStopAirline extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] routeInfo = value.toString().split(",");
 			if (routeInfo[STOPS_INDEX].equals("0") && StringUtils.isNumeric(routeInfo[AIRLINE_ID_INDEX])) {
-				airlineId.set(routeInfo[AIRLINE_ID_INDEX]);
+				airlineId.set(Integer.parseInt(routeInfo[AIRLINE_ID_INDEX]));
 				context.write(airlineId, dummyVal);
 			}
 		}
@@ -47,9 +48,9 @@ public class FindNonStopAirline extends Configured implements Tool {
 	 * @author matth
 	 *
 	 */
-	public static class FinalAirlinesMapper extends Mapper<LongWritable, Text, Text, Text> {
+	public static class FinalAirlinesMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 		private Text airlineName = new Text();
-		private Text airlineId = new Text();
+		private IntWritable airlineId = new IntWritable();
 		private final int AIRLINE_ID_INDEX = 0;
 		private final int AIRLINE_NAME_INDEX = 1;
 		
@@ -61,26 +62,26 @@ public class FindNonStopAirline extends Configured implements Tool {
 			String[] airlineInfo = value.toString().split(",");
 			if (StringUtils.isNumeric(airlineInfo[AIRLINE_ID_INDEX])) {
 				airlineName.set(airlineInfo[AIRLINE_NAME_INDEX]);
-				airlineId.set(airlineInfo[AIRLINE_ID_INDEX]);
+				airlineId.set(Integer.parseInt(airlineInfo[AIRLINE_ID_INDEX]));
 				context.write(airlineId, airlineName);
 			}
 		}
 	}
 	
 	/**
-	 * join the airline id and write the non-stop airline name as output.
+	 * write non-stop airline id and the airline name as output.
 	 * @author matth
 	 *
 	 */
-	public static class FindNonStopAirlineReducer extends Reducer<Text, Text, Text, Text> {
+	public static class FindNonStopAirlineReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 		private String STOPS = "0";
 		private Text airlineName = new Text();
-		
+		private IntWritable airlineId = new IntWritable();
 		/**
 		 * output the non-stop airline name.
 		 * @param key airline id.
 		 */
-		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+		public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			boolean haveSTOPS  = false;
 			for (Text val : values) {
 				if (val.toString().length() > 1) {
@@ -92,7 +93,8 @@ public class FindNonStopAirline extends Configured implements Tool {
 			}
 			//the values collection must has 0 and airline name
 			if (haveSTOPS && airlineName.toString().length() > 1) {
-				context.write(key, airlineName);
+				airlineId.set(Integer.parseInt(key.toString()));
+				context.write(airlineId, airlineName);
 			}
 		}
 	}
@@ -108,14 +110,14 @@ public class FindNonStopAirline extends Configured implements Tool {
 		 FileOutputFormat.setOutputPath(job, new Path(args[2]));
 		 job.setReducerClass(FindNonStopAirlineReducer.class);
 		 job.setNumReduceTasks(1);
-		 job.setOutputKeyClass(Text.class);
+		 job.setOutputKeyClass(IntWritable.class);
 		 job.setOutputValueClass(Text.class);
 		 
 		 return (job.waitForCompletion(true) ? 0 : 1);
 	}
 	
-//	public static void main(String[] args) throws Exception {
-//		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
-//		  System.exit(ecode);
-//	}
+	public static void main(String[] args) throws Exception {
+		int ecode = ToolRunner.run(new FindNonStopAirline(), args);
+		  System.exit(ecode);
+	}
 }
